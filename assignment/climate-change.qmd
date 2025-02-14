@@ -1,6 +1,6 @@
 ---
 title: "Climate Change Module"
-author: 'Add name'
+author: 'Keenan Pierce'
 format:
   html:
     embed-resources: true
