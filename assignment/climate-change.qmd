@@ -37,20 +37,23 @@ ggplot(co2, aes(x = decimal_date, y = monthly_average)) +
   geom_line() + 
   geom_line(aes(y = deseasonalized), color = "blue") +
   labs(x = "Year", y = "CO2 concentration (ppm)")
+
+plot2 <- ggplot(co2, aes(x = month, y = monthly_average))+
+  geom_point()
+plot2
 ```
 
 **Question 1:**
 
 Describe the overall trend in the CO2 data.
 
-**Answer 1:**
+The co2 data is increasing from 1958 to 2020. However, within each year the co2 decreases and then rises. 
 
 **Question 2:**
 
 How does CO2 vary within a year?  What month is it at max?  Min?  What might explain this sub-annual pattern? (you will need to write code and make a plot to answer this question)
 
-**Answer 2:**
-
+The Co2 increases in the late spring/early summmer and then drops off in the late fall/early winter. The co2 seems to be at its max in may/june. 
 
 
 ## Global Temperature Data
@@ -70,7 +73,7 @@ Describe the data set to the best of your ability, given the documentation provi
 - What is the difference between "global temperature" and "global temperature anomaly"? 
 
 **Answer 3:**
-
+The data is from NASA and measures the global surface temperature 1880 to 2024. 
 
 **Question 4:**
 
@@ -79,12 +82,30 @@ Construct the necessary R code to import and prepare for plotting the following 
 You'll need to determine the file's delimiter and any comments or skips. You will also need to be sure that you have column names. You will not directly use the code above to read the CO2 data, but that code provides helpful tips for reading the data.
 
 **Answer 4:**
+```{r}
+globaltemp <- read_table('https://data.giss.nasa.gov/gistemp/graphs/graph_data/Global_Mean_Estimates_based_on_Land_and_Ocean_Data/graph.txt', col_names = FALSE)
+colnames(globaltemp) <- c("Year", "No_smoothing", "Lowess_5","C")
+
+globaltemp <- print(globaltemp, row.names = FALSE)
+
+globaltemp <- globaltemp[-c(1:4),]
+
+globaltemp <- globaltemp |> select(-C)
+
+print(globaltemp)
+                         
+```
+
 
 **Question 5:**
 
 Plot the trend in global mean temperatures over time.  Describe what you see in the plot and how you interpret the patterns you observe.
 
-**Answer 5:**
+```{r}
+ggplot(globaltemp, aes(x = Year, y = No_smoothing,))+
+  geom_point()
+```
+
 
 ## Evaluating the evidence for a "Pause" in warming?
 
@@ -97,6 +118,7 @@ You will use rolling averages to help you explore the evidence for a pause. Sinc
 Use a search engine (e.g., Google) or a chat LLM to find out how to calculate a rolling average in R. What search term or chat LLM prompt did you use?  What website or answer from the chat LLM did you end up using?  How much did you need to modify the code from the website or chat LLM to answer the question successfully?
 
 **Answer 6:**
+I searched "How to find a rolling average in R" and went to Statology.com where they provides examples with datasets. I didn't have to modify the code much, I had the change the name of the column and change the numbers. 
 
 **Question 7:**
 
@@ -104,10 +126,27 @@ Use a search engine (e.g., Google) or a chat LLM to find out how to calculate a 
 - Create a data frame from the annual temperature anomaly data (from Question 4) with three new columns: 5-year running averages, 10-year running averages, and 20-year running averages.
 
 **Answer 7:**
+```{r}
+install.packages("zoo")
+library(zoo)
+globaltemp$No_smoothing <- as.numeric(globaltemp$No_smoothing)
+globaltemp$Rolling_avg_5 <- rollmean(globaltemp$No_smoothing, 5, fill = NA)
+globaltemp$Rolling_avg_10 <- rollmean(globaltemp$No_smoothing, 10, fill = NA)
+globaltemp$Rolling_avg_20 <- rollmean(globaltemp$No_smoothing, 20, fill = NA)
 
+class(globaltemp$Lowess_5)
+```
 **Question 8:**
 
 Plot the different averages on the *same plot* and describe what differences you see and why.  
+```{r}
+plot(globaltemp$Year ,globaltemp$Rolling_avg_5)
+lines(globaltemp$Year, globaltemp$Rolling_avg_10)
+lines(globaltemp$Year, globaltemp$Rolling_avg_20)
+
+
+```
+
 
 **Answer 8:**
 
