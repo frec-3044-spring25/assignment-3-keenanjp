@@ -146,18 +146,12 @@ class(globaltemp$Lowess_5)
 Plot the different averages on the *same plot* and describe what differences you see and why.  
 ```{r}
 globaltemp <- na.omit(globaltemp)
-globaltemp|> 
-  plot(Year, Rolling_avg_5, col = 'red')
 
-lines(global_tempclean$Year, global_tempclean$Rolling_avg_10, col = 'blue')
-
-#lines(globaltemp$Year, globaltemp$Rolling_avg_20, col = 'green')
-
-#when I search for the column name it says that it can't find it even though its in the dataset. 
-  
-
-
-
+plot(globaltemp$Year, globaltemp$Rolling_avg_5, col = 'red', type = "l" )
+lines(globaltemp$Year, globaltemp$Rolling_avg_10, col = 'blue')
+lines(globaltemp$Year, globaltemp$Rolling_avg_20, col = 'green')
+ 
+       
 
 
 ```
