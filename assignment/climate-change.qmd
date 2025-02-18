@@ -103,7 +103,11 @@ Plot the trend in global mean temperatures over time.  Describe what you see in 
 
 ```{r}
 ggplot(globaltemp, aes(x = Year, y = No_smoothing,))+
-  geom_point()
+  geom_point()+
+  labs(x = "Year", y = "global temperature index")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_x_discrete(breaks = globaltemp$Year[seq(1, length(globaltemp$Year), by=5)])
+
 ```
 
 
@@ -127,6 +131,7 @@ I searched "How to find a rolling average in R" and went to Statology.com where 
 
 **Answer 7:**
 ```{r}
+# the difference between a 5 year average and an annual average is that a 5 year average is the average of the past 5 years, while an annual average is the average of only the singular year. 
 install.packages("zoo")
 library(zoo)
 globaltemp$No_smoothing <- as.numeric(globaltemp$No_smoothing)
@@ -140,9 +145,19 @@ class(globaltemp$Lowess_5)
 
 Plot the different averages on the *same plot* and describe what differences you see and why.  
 ```{r}
-plot(globaltemp$Year ,globaltemp$Rolling_avg_5)
-lines(globaltemp$Year, globaltemp$Rolling_avg_10)
-lines(globaltemp$Year, globaltemp$Rolling_avg_20)
+globaltemp <- na.omit(globaltemp)
+globaltemp|> 
+  plot(Year, Rolling_avg_5, col = 'red')
+
+lines(global_tempclean$Year, global_tempclean$Rolling_avg_10, col = 'blue')
+
+#lines(globaltemp$Year, globaltemp$Rolling_avg_20, col = 'green')
+
+#when I search for the column name it says that it can't find it even though its in the dataset. 
+  
+
+
+
 
 
 ```
@@ -197,6 +212,16 @@ Your answer to Question 10 is going to be a mix of code chunks and text that you
 **Answer 10:**
 
 ```{r}
+# The columns of this dataset are Depth, Age of the Ice, mean age of the air, and Co2 concentration 
+# The units for the columns are m, BP, BP, and ppm
+
+icecoretable <- read_table('https://data.ess-dive.lbl.gov/catalog/d1/mn/v2/object/ess-dive-457358fdc81d3a5-20180726T203952542', col_names = FALSE)
+colnames(icecoretable) <- c("Depth(m)", "Mean_of_the_ice", "Mean_age_of_the_air", "Co2_concentration")
+icecoretable <- print(icecoretable, row.names = FALSE)
+icecoretable <- icecoretable[-c(1:16),]
+ 
+#having trouble reading in the dataset
+
 
 
 ```
