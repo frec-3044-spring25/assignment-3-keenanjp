@@ -24,7 +24,7 @@ To read the code, you will use a new function called `read_table`.  It is simila
 co2 <-  read_table("https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_mlo.txt", 
                   comment="#",
                   col_names = c("year", "month", "decimal_date",
-                                "monthly_average",
+                                "Co2_concentration",
                                 "deseasonalized", "days", "sd_days",
                                 "unc_month_mean"),
                   na = c("-1", "-99.99"))
@@ -33,14 +33,11 @@ co2
 
 
 ```{r}
-ggplot(co2, aes(x = decimal_date, y = monthly_average)) + 
+ggplot(co2, aes(x = decimal_date, y = Co2_concentration)) + 
   geom_line() + 
   geom_line(aes(y = deseasonalized), color = "blue") +
   labs(x = "Year", y = "CO2 concentration (ppm)")
 
-plot2 <- ggplot(co2, aes(x = month, y = monthly_average))+
-  geom_point()
-plot2
 ```
 
 **Question 1:**
@@ -108,6 +105,8 @@ ggplot(globaltemp, aes(x = Year, y = No_smoothing,))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_x_discrete(breaks = globaltemp$Year[seq(1, length(globaltemp$Year), by=5)])
 
+
+
 ```
 
 
@@ -132,7 +131,6 @@ I searched "How to find a rolling average in R" and went to Statology.com where 
 **Answer 7:**
 ```{r}
 # the difference between a 5 year average and an annual average is that a 5 year average is the average of the past 5 years, while an annual average is the average of only the singular year. 
-install.packages("zoo")
 library(zoo)
 globaltemp$No_smoothing <- as.numeric(globaltemp$No_smoothing)
 globaltemp$Rolling_avg_5 <- rollmean(globaltemp$No_smoothing, 5, fill = NA)
@@ -150,14 +148,14 @@ globaltemp <- na.omit(globaltemp)
 plot(globaltemp$Year, globaltemp$Rolling_avg_5, col = 'red', type = "l" )
 lines(globaltemp$Year, globaltemp$Rolling_avg_10, col = 'blue')
 lines(globaltemp$Year, globaltemp$Rolling_avg_20, col = 'green')
- 
-       
+
 
 
 ```
 
 
 **Answer 8:**
+The 20 year rolling average is a much smoother line compared to the 5 and 10 year rolling averages. This is because you are averaging more numbers, making outliers not matter as much. 
 
 **Question 9:**
 
@@ -208,15 +206,24 @@ Your answer to Question 10 is going to be a mix of code chunks and text that you
 ```{r}
 # The columns of this dataset are Depth, Age of the Ice, mean age of the air, and Co2 concentration 
 # The units for the columns are m, BP, BP, and ppm
+# the data is recorded yearly and goes back 400,000 years. 
 
-icecoretable <- read_table('https://data.ess-dive.lbl.gov/catalog/d1/mn/v2/object/ess-dive-457358fdc81d3a5-20180726T203952542', col_names = FALSE)
-colnames(icecoretable) <- c("Depth(m)", "Mean_of_the_ice", "Mean_age_of_the_air", "Co2_concentration")
-icecoretable <- print(icecoretable, row.names = FALSE)
-icecoretable <- icecoretable[-c(1:16),]
- 
-#having trouble reading in the dataset
+icecoretable <- read_table("vostok.icecore.co2",
+                           comment = "#",
+                           skip = 20, 
+                           col_names = c("Depth", "Age_of_ice", "Mean_age_of_air", "Co2_concentration"))
+icecoretable <- icecoretable |> 
+mutate(year = 2025 - Age_of_ice)
 
+ggplot(icecoretable, aes(x = year , y = Co2_concentration ))+
+  geom_line()
 
+final <- bind_rows(co2, icecoretable)
+
+ggplot(final, aes(x = year , y = Co2_concentration))+
+  geom_line()+
+  labs(title = "CO2 Concentrations Over Time", x = "Year", y = "CO2 Concentrations ppm")
+#Recent atmospheric levels are much much higher in the recent years compared to the historical levels. If we look to the right side of the graph, we will see that the concentration for Co2 increases exponentialy in the recent years. 
 
 ```
 
@@ -226,7 +233,10 @@ Remember to Render your document as HTML and comment+push to GitHub your code an
 
 # Attribution
 
-Include citation of any AI-generated assistance or discussion with classmates (per policy in syllabus). Proper documentation of AI-generated assistance includes the prompt, the source (e.g., ChatGPT), and the significant parts of the response.  Proper documentation of discussion with classmates include listing their names and the components discussed.  
+Include citation of any AI-generated assistance or discussion with classmates (per policy in syllabus). Proper documentation of AI-generated assistance includes the prompt, the source (e.g., ChatGPT), and the significant parts of the response.  Proper documentation of discussion with classmates include listing their names and the components discussed.
+
+I worked on #10 with Finn T, he helped me read in the dataset correctly
+I worked on #10 with Kaylin and Emily S. and helped them with their graphs. 
 
 
 
